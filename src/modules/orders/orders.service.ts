@@ -5,6 +5,7 @@ import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { UpdateOrderStatusDto } from './dtos/update-order-status.dto';
+import { OrdersGateway } from './orders.gateway';
 
 @Injectable()
 export class OrdersService {
@@ -13,6 +14,7 @@ export class OrdersService {
     private readonly ordersRepository: Repository<Order>,
     @InjectRepository(OrderItem)
     private readonly orderItemsRepository: Repository<OrderItem>,
+    private readonly ordersGateway: OrdersGateway, // No requiere cambios
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
@@ -42,7 +44,12 @@ export class OrdersService {
 
   async updateStatus(id: number, updateOrderStatusDto: UpdateOrderStatusDto) {
     await this.ordersRepository.update(id, updateOrderStatusDto);
-    return this.findOne(id);
+    const updatedOrder = await this.findOne(id);
+
+    // Notificar el cambio de estado a través de WebSocket
+    this.ordersGateway.notifyOrderStatusChange(id, updateOrderStatusDto.estado);
+
+    return updatedOrder;
   }
 
   async remove(id: number) {
