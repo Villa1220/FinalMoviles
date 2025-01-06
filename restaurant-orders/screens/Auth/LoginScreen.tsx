@@ -11,8 +11,8 @@ const LoginScreen = ({ navigation }) => {
     try {
       await login(email, password);
       Alert.alert('Éxito', 'Inicio de sesión exitoso.');
-    } catch {
-      Alert.alert('Error', 'Credenciales incorrectas.');
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Credenciales incorrectas.');
     }
   };
 

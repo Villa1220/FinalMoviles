@@ -5,7 +5,7 @@ import { loginUser } from '../services/authService';
 interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
-  userName: string | null; // Agregar el nombre del cliente
+  userName: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -15,15 +15,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState<string | null>(null);
-  const [userName, setUserName] = useState<string | null>(null); // Estado para el nombre del cliente
+  const [userName, setUserName] = useState<string | null>(null);
 
   const login = async (email: string, password: string) => {
     try {
       const data = await loginUser(email, password);
+      console.log('Respuesta del backend:', data); // Verificar respuesta
       if (data?.access_token) {
         setIsAuthenticated(true);
         setToken(data.access_token);
-        setUserName(data.user.name); // Guardar el nombre del cliente
+        setUserName(data.user.name);
         await AsyncStorage.setItem('authToken', data.access_token);
         console.log('Usuario autenticado. Token:', data.access_token);
       }
