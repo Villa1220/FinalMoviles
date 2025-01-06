@@ -1,24 +1,34 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
+import { registerUser } from '../../services/authService';
 
-const LoginScreen = ({ navigation }) => {
+const RegisterScreen = ({ navigation }) => {
   const { login } = useAuth();
+  const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rol] = useState('cliente');
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
+      await registerUser(nombre, email, password, rol);
       await login(email, password);
-      Alert.alert('Éxito', 'Inicio de sesión exitoso.');
-    } catch {
-      Alert.alert('Error', 'Credenciales incorrectas.');
+      Alert.alert('Éxito', 'Registro e inicio de sesión exitoso.');
+    } catch (error) {
+      Alert.alert('Error', error.message || 'No se pudo registrar o iniciar sesión.');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Iniciar Sesión</Text>
+      <Text style={styles.title}>Registrarse</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nombre"
+        value={nombre}
+        onChangeText={setNombre}
+      />
       <TextInput
         style={styles.input}
         placeholder="Correo electrónico"
@@ -32,11 +42,8 @@ const LoginScreen = ({ navigation }) => {
         value={password}
         onChangeText={setPassword}
       />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Ingresar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-        <Text style={styles.linkText}>¿No tienes cuenta? Regístrate</Text>
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <Text style={styles.buttonText}>Registrar</Text>
       </TouchableOpacity>
     </View>
   );
@@ -72,11 +79,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  linkText: {
-    marginTop: 15,
-    color: '#007bff',
-    textAlign: 'center',
-  },
 });
 
-export default LoginScreen;
+export default RegisterScreen;
