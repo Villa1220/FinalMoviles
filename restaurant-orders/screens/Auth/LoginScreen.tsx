@@ -1,5 +1,6 @@
+// screens/Auth/LoginScreen.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 
 const LoginScreen = () => {
@@ -7,8 +8,13 @@ const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    login(email, password);
+  const handleLogin = async () => {
+    try {
+      await login(email, password);
+      Alert.alert('Inicio de sesión exitoso');
+    } catch (error) {
+      Alert.alert('Error', 'Credenciales incorrectas');
+    }
   };
 
   return (

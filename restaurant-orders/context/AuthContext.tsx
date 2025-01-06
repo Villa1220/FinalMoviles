@@ -1,24 +1,38 @@
+// context/AuthContext.tsx
 import React, { createContext, useState, useContext } from 'react';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => void;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const login = (email: string, password: string) => {
-    // Lógica de autenticación (integración con authService)
-    if (email === 'admin@example.com' && password === 'password') {
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await axios.post('http://localhost:3000/auth/login', { email, password });
+      const { access_token } = response.data;
+
+      // Guardar el token en AsyncStorage o una solución similar
+      await AsyncStorage.setItem('token', access_token);
       setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      setIsAuthenticated(false);
     }
   };
 
-  const logout = () => setIsAuthenticated(false);
+  const logout = async () => {
+    await AsyncStorage.removeItem('token');
+    setIsAuthenticated(false);
+  };
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
