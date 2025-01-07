@@ -6,10 +6,16 @@ import {
   Delete,
   Body,
   Param,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { MenuService } from './menu.service';
 import { CreateMenuItemDto } from './dtos/create-menu-item.dto';
 import { UpdateMenuItemDto } from './dtos/update-menu-item.dto';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { Express } from 'express'; // Agregado
 
 @Controller('menu')
 export class MenuController {
@@ -17,7 +23,25 @@ export class MenuController {
 
   // Crear un nuevo plato
   @Post()
-  create(@Body() createMenuItemDto: CreateMenuItemDto) {
+  @UseInterceptors(
+    FileInterceptor('imagen', {
+      storage: diskStorage({
+        destination: './uploads/menu', // Carpeta para guardar imágenes
+        filename: (req, file, callback) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+        },
+      }),
+    }),
+  )
+  create(
+    @Body() createMenuItemDto: CreateMenuItemDto,
+    @UploadedFile() file: Express.Multer.File, // Cambiado
+  ) {
+    if (file) {
+      createMenuItemDto.imagen = file.filename;
+    }
     return this.menuService.create(createMenuItemDto);
   }
 
