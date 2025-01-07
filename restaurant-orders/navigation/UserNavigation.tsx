@@ -5,6 +5,7 @@ import MenuScreen from '../screens/User/MenuScreen';
 import OrderScreen from '../screens/User/OrderScren';
 import StatusScreen from '../screens/User/StatusScreen';
 import HistoryScreen from '../screens/User/HistoryScreen';
+import LogoutScreen from '../screens/User/LogoutScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -16,6 +17,7 @@ const UserNavigator = () => {
       <Drawer.Screen name="Realizar Pedido" component={OrderScreen} />
       <Drawer.Screen name="Estado del Pedido" component={StatusScreen} />
       <Drawer.Screen name="Historial de Pedidos" component={HistoryScreen} />
+      <Drawer.Screen name="Cerrar Sesión" component={LogoutScreen} />
     </Drawer.Navigator>
   );
 };

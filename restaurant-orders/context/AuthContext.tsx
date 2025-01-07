@@ -6,6 +6,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
   userName: string | null;
+  role: string | null; // Agregar el rol del usuario
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -16,6 +17,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null); // Estado para el rol del usuario
 
   const login = async (email: string, password: string) => {
     try {
@@ -25,6 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsAuthenticated(true);
         setToken(data.access_token);
         setUserName(data.user.name);
+        setRole(data.user.rol); // Guardar el rol del usuario
         await AsyncStorage.setItem('authToken', data.access_token);
         console.log('Usuario autenticado. Token:', data.access_token);
       }
@@ -38,12 +41,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthenticated(false);
     setToken(null);
     setUserName(null);
-    await AsyncStorage.removeItem('authToken');
+    setRole(null); // Limpiar el rol del usuario
+    await AsyncStorage.removeItem('authToken'); // Limpiar el token del almacenamiento
     console.log('Sesión cerrada. Token eliminado.');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, userName, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, token, userName, role, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
